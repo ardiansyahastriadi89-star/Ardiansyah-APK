@@ -2,73 +2,92 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Kalkulator Dropship Terintegrasi</title>
+    <title>Dropship Cronosphorium Pro</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; }
-        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; padding: 20px; }
+        .main-container { display: grid; grid-template-columns: 400px 1fr; gap: 20px; max-width: 1400px; margin: auto; }
+        .card { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; }
+        h2 { color: #38bdf8; margin-top: 0; font-size: 1.2em; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .input-group { margin-bottom: 10px; }
-        label { display: block; font-weight: bold; font-size: 0.85em; }
-        input { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 5px; }
-        button { width: 100%; padding: 10px; margin-top: 10px; border: none; border-radius: 5px; cursor: pointer; color: white; font-weight: bold; }
-        .btn-calc { background: #27ae60; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
-        th, td { border: 1px solid #ddd; padding: 8px; font-size: 0.8em; }
+        label { display: block; font-weight: bold; font-size: 0.75em; color: #94a3b8; }
+        input { width: 100%; padding: 8px; background: #0f172a; border: 1px solid #475569; border-radius: 6px; color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; margin-top: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-calc { background: #0ea5e9; color: white; }
+        .btn-reset { background: #ef4444; color: white; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #1e293b; }
+        th { background: #334155; padding: 10px; font-size: 0.75em; text-transform: uppercase; }
+        td { border-bottom: 1px solid #334155; padding: 8px; font-size: 0.75em; text-align: center; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>Dropship Calculator</h2>
-    <div class="input-group"><label>Nama Produk</label><input type="text" id="namaProduk"></div>
-    <div class="input-group"><label>Harga Jual (Rp)</label><input type="number" id="jual"></div>
-    <div class="input-group"><label>Diskon (%)</label><input type="number" id="diskon" value="0"></div>
-    <div class="input-group"><label>Modal (Rp)</label><input type="number" id="modal"></div>
-    <div class="input-group"><label>Ongkir (Rp)</label><input type="number" id="ongkir"></div>
-    <div class="input-group"><label>Admin (Rp)</label><input type="number" id="admin"></div>
-    
-    <button class="btn-calc" onclick="prosesData()">Hitung & Sinkronisasi</button>
-</div>
+<div class="main-container">
+    <div class="card">
+        <h2>Input Data Produk</h2>
+        <div class="form-grid">
+            <div class="input-group"><label>Nama Produk</label><input type="text" id="nama"></div>
+            <div class="input-group"><label>Supplier</label><input type="text" id="supplier"></div>
+            <div class="input-group"><label>Tipe/Warna</label><input type="text" id="variasi"></div>
+            <div class="input-group"><label>Modal (Rp)</label><input type="number" id="modal"></div>
+            <div class="input-group"><label>Jual (Rp)</label><input type="number" id="jual"></div>
+            <div class="input-group"><label>Diskon (%)</label><input type="number" id="diskon" value="0"></div>
+            <div class="input-group"><label>Admin (Rp)</label><input type="number" id="admin"></div>
+            <div class="input-group"><label>Ongkir (Rp)</label><input type="number" id="ongkir"></div>
+        </div>
+        <div class="input-group"><label>Link Produk</label><input type="text" id="link"></div>
+        <button class="btn-calc" onclick="prosesData()">Hitung & Sinkronisasi</button>
+        <button class="btn-reset" onclick="resetForm()">Reset Semua</button>
+    </div>
 
-<table id="tabelHasil">
-    <thead><tr><th>Produk</th><th>Untung</th><th>Status</th></tr></thead>
-    <tbody id="isiTabel"></tbody>
-</table>
+    <div class="card">
+        <h2>Laporan Riwayat</h2>
+        <table id="tabelHasil">
+            <thead>
+                <tr><th>Produk</th><th>Modal</th><th>Jual</th><th>Profit</th></tr>
+            </thead>
+            <tbody id="isiTabel"></tbody>
+        </table>
+    </div>
+</div>
 
 <script>
     const GOOGLE_SCRIPT_URL = "URL_WEB_APP_KAMU_DISINI";
 
+    window.onload = () => document.getElementById('isiTabel').innerHTML = localStorage.getItem('riwayat') || '';
+
     async function prosesData() {
         const data = {
-            nama: document.getElementById('namaProduk').value,
+            nama: document.getElementById('nama').value,
+            supplier: document.getElementById('supplier').value,
+            variasi: document.getElementById('variasi').value,
+            modal: parseFloat(document.getElementById('modal').value) || 0,
             jual: parseFloat(document.getElementById('jual').value) || 0,
             diskon: parseFloat(document.getElementById('diskon').value) || 0,
-            modal: parseFloat(document.getElementById('modal').value) || 0,
+            admin: parseFloat(document.getElementById('admin').value) || 0,
             ongkir: parseFloat(document.getElementById('ongkir').value) || 0,
-            admin: parseFloat(document.getElementById('admin').value) || 0
+            link: document.getElementById('link').value
         };
 
-        // Perhitungan
-        const hargaBersih = data.jual - (data.jual * (data.diskon / 100));
-        const totalModal = data.modal + data.ongkir + data.admin;
-        data.untung = hargaBersih - totalModal;
+        const diskonRp = data.jual * (data.diskon / 100);
+        const hargaBersih = data.jual - diskonRp;
+        const profit = hargaBersih - (data.modal + data.admin + data.ongkir);
 
-        // 1. Tambah ke tabel lokal
+        // Update Tabel Lokal
         const tbody = document.getElementById('isiTabel');
-        const row = tbody.insertRow();
-        row.innerHTML = `<td>${data.nama}</td><td>Rp ${data.untung.toLocaleString()}</td><td>${data.untung >= 0 ? '✅' : '❌'}</td>`;
+        tbody.innerHTML += `<tr><td>${data.nama}</td><td>${data.modal}</td><td>${hargaBersih}</td><td style="color:${profit>=0?'#4ade80':'#f87171'}">${profit}</td></tr>`;
+        localStorage.setItem('riwayat', tbody.innerHTML);
 
-        // 2. Kirim ke Google Sheets
+        // Sync ke Google Sheets
         try {
-            await fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            alert("Data berhasil tersinkronisasi ke Google Sheets!");
-        } catch (error) {
-            console.error("Gagal sinkronisasi:", error);
-        }
+            await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({...data, profit, diskonRp}) });
+            alert("Berhasil disinkronisasi ke Spreadsheet!");
+        } catch(e) { alert("Sinkronisasi gagal, periksa koneksi atau URL Web App."); }
+    }
+
+    function resetForm() {
+        localStorage.clear();
+        location.reload();
     }
 </script>
 </body>
