@@ -69,40 +69,53 @@
         return parseFloat(sanitized) || 0;
     }
 
-    async function simpanData() {
-        const editIndex = document.getElementById('editIndex').value;
-        const data = {
-            nama: document.getElementById('nama').value,
-            supplier: document.getElementById('supplier').value,
-            tipe: document.getElementById('tipe').value,
-            modal: parseCleanNumber(document.getElementById('modal').value),
-            jual: parseCleanNumber(document.getElementById('jual').value),
-            diskon: parseCleanNumber(document.getElementById('diskon').value),
-            admin: parseCleanNumber(document.getElementById('admin').value),
-            ongkir: parseCleanNumber(document.getElementById('ongkir').value),
-            linksupplier: document.getElementById('linksupplier').value,
-            linktoko: document.getElementById('linktoko').value
-        };
+  async function simpanData() {
+    const editIndex = document.getElementById('editIndex').value;
+    const data = {
+        nama: document.getElementById('nama').value,
+        supplier: document.getElementById('supplier').value,
+        tipe: document.getElementById('tipe').value,
+        modal: parseCleanNumber(document.getElementById('modal').value),
+        jual: parseCleanNumber(document.getElementById('jual').value),
+        diskon: parseCleanNumber(document.getElementById('diskon').value),
+        admin: parseCleanNumber(document.getElementById('admin').value),
+        ongkir: parseCleanNumber(document.getElementById('ongkir').value),
+        linksupplier: document.getElementById('linksupplier').value,
+        linktoko: document.getElementById('linktoko').value
+    };
 
-        if(!data.nama) return alert("Isi nama produk!");
-        if(!data.modal) return alert("Isi harga modal!");
-        if(!data.linksupplier) return alert("Isi link supplier!");
+    if(!data.nama) return alert("Isi nama produk!");
+    if(!data.modal) return alert("Isi harga modal!");
+    if(!data.linksupplier) return alert("Isi link supplier!");
 
-        const hargaBersih = data.jual - (data.jual * (data.diskon / 100));
-        data.profit = hargaBersih - (data.modal + data.admin + data.ongkir);
+    const hargaBersih = data.jual - (data.jual * (data.diskon / 100));
+    data.profit = hargaBersih - (data.modal + data.admin + data.ongkir);
 
-        if (editIndex === "-1") dataList.push(data);
-        else { dataList[editIndex] = data; document.getElementById('editIndex').value = "-1"; }
-        
-        localStorage.setItem('dropshipData', JSON.stringify(dataList));
-        renderTable();
-        
-        try {
-            await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
-        } catch(e) { console.error("Sync gagal", e); }
+    if (editIndex === "-1") dataList.push(data);
+    else { dataList[editIndex] = data; document.getElementById('editIndex').value = "-1"; }
+    
+    localStorage.setItem('dropshipData', JSON.stringify(dataList));
+    renderTable();
+    
+    // --- PERBAIKAN DI SINI ---
+    try {
+        const formData = new FormData();
+        for (const key in data) {
+            formData.append(key, data[key]);
+        }
 
-        document.querySelectorAll('input:not([type="hidden"])').forEach(i => i.value = '');
+        await fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            body: formData 
+        });
+        alert("Data berhasil tersinkronisasi!");
+    } catch(e) { 
+        console.error("Sync gagal", e);
+        alert("Gagal sinkronisasi ke Spreadsheet");
     }
+
+    document.querySelectorAll('input:not([type="hidden"])').forEach(i => i.value = '');
+}
 
     function renderTable() {
         const tbody = document.getElementById('isiTabel');
