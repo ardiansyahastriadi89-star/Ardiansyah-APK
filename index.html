@@ -184,7 +184,7 @@ function renderPagination() {
     const pageCount = Math.ceil(dataList.length / rowsPerPage);
     let nav = '<div style="margin-top:15px; text-align:center;">';
     for(let i = 1; i <= pageCount; i++) {
-        nav += `<button onclick="changePage(${i})" style="margin:2px; padding:5px 10px; cursor:pointer; background:${currentPage===i?'#0ea5e9':'#036bf3'}; color:white; border:none; border-radius:4px;">${i}</button>`;
+        nav += `<button onclick="changePage(${i})" style="margin:2px; padding:5px 10px; cursor:pointer; background:${currentPage===i?'#036bf3':'#334155'}; color:white; border:none; border-radius:4px;">${i}</button>`;
     }
     nav += '</div>';
     document.getElementById('tabelHasil').insertAdjacentHTML('afterend', nav);
