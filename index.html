@@ -50,6 +50,7 @@
         <button class="btn-action btn-save" onclick="simpanData()">Simpan Data</button>
         <button class="btn-action btn-reset" onclick="resetData()">Reset Semua Data</button>
     </div>
+         
         <div class="card">
             <table id="tabelHasil">
                 <thead><tr><th>Produk</th><th>Supplier</th><th>Tipe</th><th>Profit</th><th>Status</th><th>Link Supplier</th><th>Link Toko</th><th>Aksi</th></tr></thead>
@@ -60,7 +61,6 @@
 </div>
 
 <script>
-    // Pastikan URL Google Script Anda sudah benar
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz6aLfDCcNYga8M8usMfvlNcmfwmIxzBdN1SSLGu4WBH0ZwzynhZ7iNXgts6GGPUlGi/exec";
     let dataList = JSON.parse(localStorage.getItem('dropshipData')) || [];
 
@@ -80,8 +80,8 @@
             diskon: parseCleanNumber(document.getElementById('diskon').value),
             admin: parseCleanNumber(document.getElementById('admin').value),
             ongkir: parseCleanNumber(document.getElementById('ongkir').value),
-            linksupplier: document.getElementById('linksupplier').value, // Diperbaiki
-            linktoko: document.getElementById('linktoko').value        // Diperbaiki
+            linksupplier: document.getElementById('linksupplier').value,
+            linktoko: document.getElementById('linktoko').value
         };
 
         if(!data.nama) return alert("Isi nama produk!");
@@ -91,22 +91,14 @@
         const hargaBersih = data.jual - (data.jual * (data.diskon / 100));
         data.profit = hargaBersih - (data.modal + data.admin + data.ongkir);
 
-        if (editIndex === "-1") {
-            dataList.push(data);
-        } else {
-            dataList[editIndex] = data;
-            document.getElementById('editIndex').value = "-1";
-        }
+        if (editIndex === "-1") dataList.push(data);
+        else { dataList[editIndex] = data; document.getElementById('editIndex').value = "-1"; }
         
         localStorage.setItem('dropshipData', JSON.stringify(dataList));
         renderTable();
         
         try {
-            await fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify(data)
-            });
+            await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
         } catch(e) { console.error("Sync gagal", e); }
 
         document.querySelectorAll('input:not([type="hidden"])').forEach(i => i.value = '');
@@ -117,9 +109,8 @@
         tbody.innerHTML = '';
         dataList.forEach((item, index) => {
             tbody.innerHTML += `<tr>
-                <td>${item.nama}</td>
-                <td>${item.supplier}</td>
-                <td>${item.tipe}</td> <td style="color:${item.profit>=0?'#4ade80':'#f87171'}">Rp ${item.profit.toLocaleString()}</td>
+                <td>${item.nama}</td><td>${item.supplier}</td><td>${item.tipe}</td>
+                <td style="color:${item.profit>=0?'#4ade80':'#f87171'}">Rp ${item.profit.toLocaleString()}</td>
                 <td>${item.profit >= 0 ? "Untung" : "Rugi"}</td>
                 <td><a href="${item.linksupplier}" target="_blank">Supplier</a></td>
                 <td><a href="${item.linktoko}" target="_blank">Toko</a></td>
@@ -129,7 +120,6 @@
                 </td>
             </tr>`;
         });
-        updateChart();
     }
 
     function editData(index) {
@@ -142,8 +132,8 @@
         document.getElementById('diskon').value = item.diskon;
         document.getElementById('admin').value = item.admin;
         document.getElementById('ongkir').value = item.ongkir;
-        document.getElementById('linksupplier').value = item.linksupplier; // Perbaikan
-        document.getElementById('linktoko').value = item.linktoko;       // Perbaikan
+        document.getElementById('linksupplier').value = item.linksupplier;
+        document.getElementById('linktoko').value = item.linktoko;
         document.getElementById('editIndex').value = index;
     }
 
@@ -161,9 +151,6 @@
             renderTable();
         }
     }
-
-    const ctx = document.getElementById('profitChart').getContext('2d');
-    let profitChart = new Chart(ctx, { type: 'bar', data: { labels: [], datasets: [{ label: 'Profit', data: [], backgroundColor: '#05ac2f' }] } });
 
     window.onload = renderTable;
 </script>
