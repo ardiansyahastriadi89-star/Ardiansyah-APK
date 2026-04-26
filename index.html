@@ -58,7 +58,7 @@
         </div>
         <div class="card">
             <table id="tabelHasil">
-                <thead><tr><th>Produk</th><th>Supplier</th><th>Profit</th><th>Status</th><th>Link Supplier</th><th>Link Toko</th><th>Aksi</th></tr></thead>
+                <thead><tr><th>Produk</th><th>Supplier</th><th>Tipe</th><th>Profit</th><th>Status</th><th>Link Supplier</th><th>Link Toko</th><th>Aksi</th></tr></thead>
                 <tbody id="isiTabel"></tbody>
             </table>
         </div>
@@ -123,8 +123,9 @@
         tbody.innerHTML = '';
         dataList.forEach((item, index) => {
             tbody.innerHTML += `<tr>
-                <td>${item.nama}</td><td>${item.supplier}</td>
-                <td style="color:${item.profit>=0?'#4ade80':'#f87171'}">Rp ${item.profit.toLocaleString()}</td>
+                <td>${item.nama}</td>
+                <td>${item.supplier}</td>
+                <td>${item.tipe}</td> <td style="color:${item.profit>=0?'#4ade80':'#f87171'}">Rp ${item.profit.toLocaleString()}</td>
                 <td>${item.profit >= 0 ? "Untung" : "Rugi"}</td>
                 <td><a href="${item.linksupplier}" target="_blank">Supplier</a></td>
                 <td><a href="${item.linktoko}" target="_blank">Toko</a></td>
