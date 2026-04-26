@@ -50,12 +50,6 @@
         <button class="btn-action btn-save" onclick="simpanData()">Simpan Data</button>
         <button class="btn-action btn-reset" onclick="resetData()">Reset Semua Data</button>
     </div>
-
-    <div>
-        <div class="card">
-            <h2>Grafik Profit</h2>
-            <canvas id="profitChart" height="50"></canvas>
-        </div>
         <div class="card">
             <table id="tabelHasil">
                 <thead><tr><th>Produk</th><th>Supplier</th><th>Tipe</th><th>Profit</th><th>Status</th><th>Link Supplier</th><th>Link Toko</th><th>Aksi</th></tr></thead>
@@ -170,12 +164,6 @@
 
     const ctx = document.getElementById('profitChart').getContext('2d');
     let profitChart = new Chart(ctx, { type: 'bar', data: { labels: [], datasets: [{ label: 'Profit', data: [], backgroundColor: '#05ac2f' }] } });
-
-    function updateChart() {
-        profitChart.data.labels = dataList.map(i => i.nama);
-        profitChart.data.datasets[0].data = dataList.map(i => i.profit);
-        profitChart.update();
-    }
 
     window.onload = renderTable;
 </script>
