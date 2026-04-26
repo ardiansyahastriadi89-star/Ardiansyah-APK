@@ -13,7 +13,7 @@
         .btn-save { background: #05ac2f; width: 100%; }
         .btn-edit { background: #f59e0b; }
         .btn-del { background: #ef4444; }
-        .btn-reset { background: #0544f0; width: 100%; margin-top: 10px; }
+        .btn-reset { background: #0615e2; width: 100%; margin-top: 10px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85em; }
         th, td { padding: 10px; border: 1px solid #334155; text-align: center; }
     </style>
@@ -26,6 +26,7 @@
         <input type="hidden" id="editIndex" value="-1">
         Nama Produk<input type="text" id="nama" required>
         Supplier<input type="text" id="supplier">
+        Tipe/Variasi<input type="text" id="tipe">
         Modal<input type="text" id="modal" placeholder="Contoh: 100.000">
         Harga Jual<input type="text" id="jual" placeholder="Contoh: 150.000">
         Diskon (%)<input type="number" id="diskon" value="0">
@@ -39,7 +40,7 @@
     <div>
         <div class="card">
             <h2>Grafik Profit</h2>
-            <canvas id="profitChart" height="100"></canvas>
+            <canvas id="profitChart" height="50"></canvas>
         </div>
         <div class="card">
             <table id="tabelHasil">
@@ -64,6 +65,7 @@
         const data = {
             nama: document.getElementById('nama').value,
             supplier: document.getElementById('supplier').value,
+            tipe: document.getElementById('tipe').value,
             modal: parseCleanNumber(document.getElementById('modal').value),
             jual: parseCleanNumber(document.getElementById('jual').value),
             diskon: parseCleanNumber(document.getElementById('diskon').value),
@@ -121,6 +123,7 @@
         const item = dataList[index];
         document.getElementById('nama').value = item.nama;
         document.getElementById('supplier').value = item.supplier;
+        document.getElementById('tipe').value = item.tipe;
         document.getElementById('modal').value = item.modal;
         document.getElementById('jual').value = item.jual;
         document.getElementById('diskon').value = item.diskon;
@@ -147,7 +150,7 @@
 
     // Grafik
     const ctx = document.getElementById('profitChart').getContext('2d');
-    let profitChart = new Chart(ctx, { type: 'bar', data: { labels: [], datasets: [{ label: 'Profit', data: [], backgroundColor: '#0ea5e9' }] } });
+    let profitChart = new Chart(ctx, { type: 'bar', data: { labels: [], datasets: [{ label: 'Profit', data: [], backgroundColor: '#05ac2f' }] } });
 
     function updateChart() {
         profitChart.data.labels = dataList.map(i => i.nama);
