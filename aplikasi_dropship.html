@@ -1,6 +1,20 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    
+    <script> 
+    window.onload = async function() {
+    try {
+        const response = await fetch(GOOGLE_SCRIPT_URL);
+        const result = await response.json();
+        dataList = result.database;
+        renderTable();
+    } catch (e) {
+        console.error("Gagal mengambil data dari cloud:", e);
+    }
+};
+</script>
+    
     <meta charset="UTF-8">
     <title>Aplikasi Dropship</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -168,8 +182,8 @@ function updatePreview() {
             <td>${item.nama}</td><td>${item.supplier}</td><td>${item.tipe}</td>
             <td style="color:${item.profit>=0?'#4ade80':'#f87171'}">Rp ${item.profit.toLocaleString()}</td>
             <td>${item.profit >= 0 ? "Untung" : "Rugi"}</td>
-            <td><a href="${item.linksupplier}" target="_blank">Link</a></td>
-            <td><a href="${item.linktoko}" target="_blank">Link</a></td>
+            <td><a href="${item.linksupplier}" target="_blank">Supplier</a></td>
+            <td><a href="${item.linktoko}" target="_blank">Toko Saya</a></td>
             <td>
                 <button class="btn-edit" onclick="editData(${actualIndex})">Edit</button>
                 <button class="btn-del" onclick="hapusData(${actualIndex})">Hapus</button>
@@ -230,7 +244,6 @@ function changePage(page) {
         }
     }
 
-    window.onload = renderTable;
 </script>
 </body>
 </html>
