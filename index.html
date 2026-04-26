@@ -73,6 +73,8 @@
 <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz6aLfDCcNYga8M8usMfvlNcmfwmIxzBdN1SSLGu4WBH0ZwzynhZ7iNXgts6GGPUlGi/exec";
     let dataList = JSON.parse(localStorage.getItem('dropshipData')) || [];
+    let currentPage = 1;
+    const rowsPerPage = 6;
 
     function parseCleanNumber(value) {
         let sanitized = value.toString().replace(/\./g, '').replace(',', '.');
@@ -155,23 +157,46 @@ function updatePreview() {
 }
 
     function renderTable() {
-        const tbody = document.getElementById('isiTabel');
-        tbody.innerHTML = '';
-        dataList.forEach((item, index) => {
-            tbody.innerHTML += `<tr>
-                <td>${item.nama}</td><td>${item.supplier}</td><td>${item.tipe}</td>
-                <td style="color:${item.profit>=0?'#4ade80':'#f87171'}">Rp ${item.profit.toLocaleString()}</td>
-                <td>${item.profit >= 0 ? "Untung" : "Rugi"}</td>
-                <td><a href="${item.linksupplier}" target="_blank">Supplier</a></td>
-                <td><a href="${item.linktoko}" target="_blank">Toko</a></td>
-                <td>
-                    <button class="btn-edit" onclick="editData(${index})">Edit</button>
-                    <button class="btn-del" onclick="hapusData(${index})">Hapus</button>
-                </td>
-            </tr>`;
-        });
-    }
+    const tbody = document.getElementById('isiTabel');
+    tbody.innerHTML = '';
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    const paginatedItems = dataList.slice(start, end);
+    paginatedItems.forEach((item, index) => {
+        const actualIndex = start + index; 
+        tbody.innerHTML += `<tr>
+            <td>${item.nama}</td><td>${item.supplier}</td><td>${item.tipe}</td>
+            <td style="color:${item.profit>=0?'#4ade80':'#f87171'}">Rp ${item.profit.toLocaleString()}</td>
+            <td>${item.profit >= 0 ? "Untung" : "Rugi"}</td>
+            <td><a href="${item.linksupplier}" target="_blank">Link</a></td>
+            <td><a href="${item.linktoko}" target="_blank">Link</a></td>
+            <td>
+                <button class="btn-edit" onclick="editData(${actualIndex})">Edit</button>
+                <button class="btn-del" onclick="hapusData(${actualIndex})">Hapus</button>
+            </td>
+        </tr>`;
+    });
+    
+    renderPagination();
+}
 
+function renderPagination() {
+    const pageCount = Math.ceil(dataList.length / rowsPerPage);
+    let nav = '<div style="margin-top:15px; text-align:center;">';
+    for(let i = 1; i <= pageCount; i++) {
+        nav += `<button onclick="changePage(${i})" style="margin:2px; padding:5px 10px; cursor:pointer; background:${currentPage===i?'#0ea5e9':'#334155'}; color:white; border:none; border-radius:4px;">${i}</button>`;
+    }
+    nav += '</div>';
+    document.getElementById('tabelHasil').insertAdjacentHTML('afterend', nav);
+}
+
+function changePage(page) {
+    currentPage = page;
+    renderTable();
+    const oldNav = document.querySelector('div[style*="margin-top:15px"]');
+    if(oldNav) oldNav.remove();
+}
+    
     function editData(index) {
         const item = dataList[index];
         document.getElementById('nama').value = item.nama;
@@ -188,11 +213,14 @@ function updatePreview() {
     }
 
     async function hapusData(index) {
-        if (!confirm("Yakin hapus?")) return;
-        dataList.splice(index, 1);
-        localStorage.setItem('dropshipData', JSON.stringify(dataList));
-        renderTable();
+    if (!confirm("Yakin hapus?")) return;
+    dataList.splice(index, 1);
+    if (currentPage > 1 && (currentPage - 1) * rowsPerPage >= dataList.length) {
+        currentPage--;
     }
+    localStorage.setItem('dropshipData', JSON.stringify(dataList));
+    renderTable();
+}
 
     function resetData() {
         if(confirm("Yakin hapus semua data?")) {
